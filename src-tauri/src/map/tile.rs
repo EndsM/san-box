@@ -12,4 +12,10 @@ pub enum Terrain {
     Sea,
 }
 
+impl Terrain {
+    pub const fn is_water(self) -> bool {
+        matches!(self, Terrain::Lake | Terrain::Sea | Terrain::River)
+    }
+}
+
 pub struct Tile {}

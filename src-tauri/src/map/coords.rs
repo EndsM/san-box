@@ -39,6 +39,43 @@ impl Direction {
         Direction::West,
         Direction::NorthWest,
     ];
+
+    pub const fn delta(self) -> (i32, i32) {
+        match self {
+            Direction::North => (0, -1),
+            Direction::NorthEast => (1, -1),
+            Direction::East => (1, 0),
+            Direction::SouthEast => (1, 1),
+            Direction::South => (0, 1),
+            Direction::SouthWest => (-1, 1),
+            Direction::West => (-1, 0),
+            Direction::NorthWest => (-1, -1),
+        }
+    }
+
+    pub const fn opposite(self) -> Direction {
+        match self {
+            Direction::North => Direction::South,
+            Direction::NorthEast => Direction::SouthWest,
+            Direction::East => Direction::West,
+            Direction::SouthEast => Direction::NorthWest,
+            Direction::South => Direction::North,
+            Direction::SouthWest => Direction::NorthEast,
+            Direction::West => Direction::East,
+            Direction::NorthWest => Direction::SouthEast,
+        }
+    }
+
+    // Check if the direction is diagonal
+    pub const fn is_diagonal(self) -> bool {
+        matches!(
+            self,
+            Direction::NorthEast
+                | Direction::SouthEast
+                | Direction::SouthWest
+                | Direction::NorthWest
+        )
+    }
 }
 
 // The universal behavior for int based coords
@@ -49,6 +86,17 @@ pub trait GridCoord: Copy + Eq + Hash + Sized {
 
     fn offset(self, dx: i32, dy: i32) -> Self {
         Self::from_xy(self.x() + dx, self.y() + dy)
+    }
+
+    // Move one step towards direction
+    fn step(self, dir: Direction) -> Self {
+        let (dx, dy) = dir.delta();
+        self.offset(dx, dy)
+    }
+
+    // 4 cardinal neighbors (North, East, South, West)
+    fn neighbors4(self) -> [Self; 4] {
+        Direction::CARDINAL.map(|d| self.step(d))
     }
 }
 

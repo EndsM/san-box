@@ -341,6 +341,8 @@ impl From<(i32, i32)> for BattleCoord {
     }
 }
 
+// A rectangle of tiles, can represent a map area, or a viewport, etc
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct TileRect {
     min: TileCoord,
     max: TileCoord,

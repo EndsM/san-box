@@ -288,8 +288,55 @@ impl SubTileCoord {
     }
 }
 
+impl GridCoord for SubTileCoord {
+    fn x(self) -> i32 {
+        self.x
+    }
+    fn y(self) -> i32 {
+        self.y
+    }
+    fn from_xy(x: i32, y: i32) -> Self {
+        Self::new(x, y)
+    }
+}
+
+impl From<(i32, i32)> for SubTileCoord {
+    fn from((x, y): (i32, i32)) -> Self {
+        Self::new(x, y)
+    }
+}
+
 // Represent subtile's local coord in a battle map
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Default, Serialize, Deserialize,
+)]
 pub struct BattleCoord {
     x: i32,
     y: i32,
+}
+
+impl BattleCoord {
+    pub const ORIGIN: BattleCoord = BattleCoord { x: 0, y: 0 };
+
+    pub const fn new(x: i32, y: i32) -> Self {
+        Self { x, y }
+    }
+}
+
+impl GridCoord for BattleCoord {
+    fn x(self) -> i32 {
+        self.x
+    }
+    fn y(self) -> i32 {
+        self.y
+    }
+    fn from_xy(x: i32, y: i32) -> Self {
+        Self::new(x, y)
+    }
+}
+
+impl From<(i32, i32)> for BattleCoord {
+    fn from((x, y): (i32, i32)) -> Self {
+        Self::new(x, y)
+    }
 }

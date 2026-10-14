@@ -31,8 +31,9 @@ pub enum RoadLevel {
     Highway,
 }
 
-pub struct Tile {
+pub struct MapTile {
     terrain: Terrain,
     // Maybe add a elevation to tiles
     elevation: u8,
+    road: RoadLevel,
 }

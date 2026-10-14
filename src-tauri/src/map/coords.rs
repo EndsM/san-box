@@ -158,6 +158,24 @@ struct LocalCoordRepr {
     y: u8,
 }
 
+impl TryFrom<LocalCoordRepr> for LocalCoord {
+    type Error = String;
+
+    fn try_from(value: LocalCoordRepr) -> Result<Self, Self::Error> {
+        if value.x < SUB_TILE_SIZE as u8 && value.y < SUB_TILE_SIZE as u8 {
+            Ok(LocalCoord {
+                x: value.x,
+                y: value.y,
+            })
+        } else {
+            Err(format!(
+                "LocalCoord out of bounds: x={}, y={}",
+                value.x, value.y
+            ))
+        }
+    }
+}
+
 impl LocalCoord {
     pub const CENTER: LocalCoord = LocalCoord {
         x: (SUB_TILE_SIZE / 2) as u8,

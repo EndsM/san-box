@@ -1,0 +1,94 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+    # Ignore stuff that not a code change
+    paths-ignore:
+      - "**.md"
+      - ".vscode/**"
+      - ".gitignore"
+  workflow_dispatch:
+    inputs:
+      full_optimization:
+        description: "Use the full release profile from Cargo.toml (fat LTO, 1 codegen unit). Much slower."
+        type: boolean
+        default: false
+
+# A newer push to main supersedes an older, still-running build
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_PROFILE_RELEASE_LTO: ${{ inputs.full_optimization && 'fat' || 'off' }}
+  CARGO_PROFILE_RELEASE_CODEGEN_UNITS: ${{ inputs.full_optimization && '1' || '16' }}
+  NO_STRIP: "true"
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false # one platform failing shouldn't cancel the other
+      matrix:
+        include:
+          - name: linux-x64
+            os: ubuntu-24.04
+            bundles: deb,rpm,appimage
+            artifacts: |
+              src-tauri/target/release/bundle/deb/*.deb
+              src-tauri/target/release/bundle/rpm/*.rpm
+              src-tauri/target/release/bundle/appimage/*.AppImage
+          - name: windows-x64
+            os: windows-latest
+            # NSIS only: skipping MSI for now
+            bundles: nsis
+            artifacts: |
+              src-tauri/target/release/bundle/nsis/*.exe
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            build-essential \
+            curl \
+            wget \
+            file \
+            libxdo-dev \
+            libssl-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            patchelf
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+          cache-on-failure: true
+
+      - run: npm ci
+
+      - name: Build
+        run: npm run tauri build -- --bundles ${{ matrix.bundles }}
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: san-box-${{ matrix.name }}
+          path: ${{ matrix.artifacts }}
+          if-no-files-found: error
+          compression-level: 0 # installers are already compressed

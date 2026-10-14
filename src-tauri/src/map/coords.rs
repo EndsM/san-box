@@ -340,3 +340,18 @@ impl From<(i32, i32)> for BattleCoord {
         Self::new(x, y)
     }
 }
+
+pub struct TileRect {
+    min: TileCoord,
+    max: TileCoord,
+}
+
+impl TileRect {
+    // Auto construct from two diagonal corners
+    pub fn new(a: TileCoord, b: TileCoord) -> Self {
+        Self {
+            min: TileCoord::new(a.x.min(b.x), a.y.min(b.y)),
+            max: TileCoord::new(a.x.max(b.x), a.y.max(b.y)),
+        }
+    }
+}

@@ -1,5 +1,7 @@
 use std::hash::Hash;
 
+use serde::{Deserialize, Serialize};
+
 // The sub tile is within a world tile
 pub const SUB_TILE_SIZE: usize = 15;
 // Calculate the result count here for now
@@ -8,6 +10,7 @@ pub const SUB_TILE_COUNT: usize = SUB_TILE_SIZE * SUB_TILE_SIZE;
 pub const SIZE_I32: i32 = SUB_TILE_SIZE as i32;
 
 // Directions may used later for unit facing, pathfinding, etc
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum Direction {
     North,
     NorthEast,
@@ -120,6 +123,9 @@ pub trait GridCoord: Copy + Eq + Hash + Sized {
 }
 
 // This represent a tile's coord on the big map
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Default, Serialize, Deserialize,
+)]
 pub struct TileCoord {
     pub x: i32,
     pub y: i32,
@@ -147,12 +153,17 @@ impl TileCoord {
 }
 
 // This represent a subtile's coord in its Tile, thus LocalCoord
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Default, Serialize, Deserialize,
+)]
+#[serde(try_from = "LocalCoordRepr")]
 pub struct LocalCoord {
     x: u8,
     y: u8,
 }
 
 // Shadow struct for serd and deserd check
+#[derive(Deserialize)]
 struct LocalCoordRepr {
     x: u8,
     y: u8,
@@ -224,6 +235,9 @@ impl LocalCoord {
 }
 
 // This represent a subtile's global Coord, which means a subtile now can be traced globally.
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Default, Serialize, Deserialize,
+)]
 pub struct SubTileCoord {
     pub x: i32,
     pub y: i32,
@@ -236,6 +250,21 @@ impl SubTileCoord {
 
     pub const fn tile(self) -> TileCoord {
         TileCoord::new(self.x.div_euclid(SIZE_I32), self.y.div_euclid(SIZE_I32))
+    }
+
+    pub const fn local(self) -> LocalCoord {
+        LocalCoord {
+            x: self.x.rem_euclid(SIZE_I32) as u8,
+            y: self.y.rem_euclid(SIZE_I32) as u8,
+        }
+    }
+
+    pub const fn split(self) -> (TileCoord, LocalCoord) {
+        (self.tile(), self.local())
+    }
+
+    pub const fn from_parts(tile: TileCoord, local: LocalCoord) -> Self {
+        tile.sub(local)
     }
 }
 

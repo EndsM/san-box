@@ -152,6 +152,26 @@ impl TileCoord {
     }
 }
 
+impl GridCoord for TileCoord {
+    fn x(self) -> i32 {
+        self.x
+    }
+
+    fn y(self) -> i32 {
+        self.y
+    }
+
+    fn from_xy(x: i32, y: i32) -> Self {
+        Self::new(x, y)
+    }
+}
+
+impl From<(i32, i32)> for TileCoord {
+    fn from((x, y): (i32, i32)) -> Self {
+        Self::new(x, y)
+    }
+}
+
 // This represent a subtile's coord in its Tile, thus LocalCoord
 #[derive(
     Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Default, Serialize, Deserialize,

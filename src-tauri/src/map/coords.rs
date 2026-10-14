@@ -67,7 +67,12 @@ pub struct LocalCoord {
     y: u8,
 }
 
-impl LocalCoord {}
+impl LocalCoord {
+    pub const CENTER: LocalCoord = LocalCoord {
+        x: (SUB_TILE_SIZE / 2) as u8,
+        y: (SUB_TILE_SIZE / 2) as u8,
+    };
+}
 
 // This represent a subtile's global Coord, which means a subtile now can be traced globally.
 pub struct SubTileCoord {

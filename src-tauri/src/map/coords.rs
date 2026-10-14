@@ -185,6 +185,42 @@ impl LocalCoord {
             None
         }
     }
+
+    pub const fn x(self) -> u8 {
+        self.x
+    }
+
+    pub const fn y(self) -> u8 {
+        self.y
+    }
+
+    // Row-major linear index for compact flat-array storage [T; SUB_TILE_COUNT]
+    pub const fn index(self) -> usize {
+        self.y as usize * SUB_TILE_SIZE + self.x as usize
+    }
+
+    // Inverse of index(), returns None if out of range
+    pub const fn from_index(index: usize) -> Option<Self> {
+        if index < SUB_TILE_COUNT {
+            Some(Self {
+                x: (index % SUB_TILE_SIZE) as u8,
+                y: (index / SUB_TILE_SIZE) as u8,
+            })
+        } else {
+            None
+        }
+    }
+
+    // Check if sub-tile at edge
+    pub const fn is_edge(self) -> bool {
+        let max = (SUB_TILE_SIZE - 1) as u8;
+        self.x == 0 || self.y == 0 || self.x == max || self.y == max
+    }
+
+    // Row-major iterator over all local coordinates
+    pub fn all() -> impl Iterator<Item = LocalCoord> {
+        (0..SUB_TILE_COUNT).map(|i| LocalCoord::from_index(i).expect("index in range"))
+    }
 }
 
 // This represent a subtile's global Coord, which means a subtile now can be traced globally.

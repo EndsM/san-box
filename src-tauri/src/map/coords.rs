@@ -98,6 +98,25 @@ pub trait GridCoord: Copy + Eq + Hash + Sized {
     fn neighbors4(self) -> [Self; 4] {
         Direction::CARDINAL.map(|d| self.step(d))
     }
+
+    // 8 neighbors (clockwise from North)
+    fn neighbors8(self) -> [Self; 8] {
+        Direction::ALL.map(|d| self.step(d))
+    }
+
+    // Manhattan distance (4-way steps)
+    fn manhattan_distance(self, other: Self) -> u32 {
+        self.x()
+            .abs_diff(other.x())
+            .saturating_add(self.y().abs_diff(other.y()))
+    }
+
+    // Chebyshev distance (8-way steps)
+    fn chebyshev_distance(self, other: Self) -> u32 {
+        self.x()
+            .abs_diff(other.x())
+            .max(self.y().abs_diff(other.y()))
+    }
 }
 
 // This represent a tile's coord on the big map

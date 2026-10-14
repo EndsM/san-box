@@ -1,4 +1,5 @@
 pub mod coords;
+pub mod error;
 pub mod region;
 pub mod tile;
 pub mod world;

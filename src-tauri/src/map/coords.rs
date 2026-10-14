@@ -203,6 +203,7 @@ impl TryFrom<LocalCoordRepr> for LocalCoord {
 }
 
 impl LocalCoord {
+    // The exact center sub-tile of a tile
     pub const CENTER: LocalCoord = LocalCoord {
         x: (SUB_TILE_SIZE / 2) as u8,
         y: (SUB_TILE_SIZE / 2) as u8,

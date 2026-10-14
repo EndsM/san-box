@@ -1,3 +1,5 @@
+use std::hash::Hash;
+
 // The sub tile is within a world tile
 pub const SUB_TILE_SIZE: usize = 15;
 // Calculate the result count here for now
@@ -37,6 +39,17 @@ impl Direction {
         Direction::West,
         Direction::NorthWest,
     ];
+}
+
+// The universal behavior for int based coords
+pub trait GridCoord: Copy + Eq + Hash + Sized {
+    fn x(self) -> i32;
+    fn y(self) -> i32;
+    fn from_xy(x: i32, y: i32) -> Self;
+
+    fn offset(self, dx: i32, dy: i32) -> Self {
+        Self::from_xy(self.x() + dx, self.y() + dy)
+    }
 }
 
 // This represent a tile's coord on the big map

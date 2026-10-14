@@ -17,7 +17,25 @@ pub enum Direction {
     NorthWest,
 }
 
-impl Direction {}
+impl Direction {
+    pub const CARDINAL: [Direction; 4] = [
+        Direction::North,
+        Direction::East,
+        Direction::South,
+        Direction::West,
+    ];
+
+    pub const ALL:[Direction;8]=[
+        Direction::North,
+        Direction::NorthEast,
+        Direction::East,
+        Direction::SouthEast,
+        Direction::South,
+        Direction::SouthWest,
+        Direction::West,
+        Direction::NorthWest,
+    ];
+}
 
 // This represent a tile's coord on the big map
 pub struct TileCoord {
@@ -65,6 +83,7 @@ impl SubTileCoord {
     }
 }
 
+// Represent subtile's local coord in a battle map
 pub struct BattleCoord {
     x: i32,
     y: i32,

@@ -161,18 +161,13 @@ struct LocalCoordRepr {
 impl TryFrom<LocalCoordRepr> for LocalCoord {
     type Error = String;
 
-    fn try_from(value: LocalCoordRepr) -> Result<Self, Self::Error> {
-        if value.x < SUB_TILE_SIZE as u8 && value.y < SUB_TILE_SIZE as u8 {
-            Ok(LocalCoord {
-                x: value.x,
-                y: value.y,
-            })
-        } else {
-            Err(format!(
-                "LocalCoord out of bounds: x={}, y={}",
-                value.x, value.y
-            ))
-        }
+    fn try_from(r: LocalCoordRepr) -> Result<Self, Self::Error> {
+        LocalCoord::new(r.x, r.y).ok_or_else(|| {
+            format!(
+                "local coord ({}, {}) out of range 0..{}",
+                r.x, r.y, SUB_TILE_SIZE
+            )
+        })
     }
 }
 
@@ -181,6 +176,15 @@ impl LocalCoord {
         x: (SUB_TILE_SIZE / 2) as u8,
         y: (SUB_TILE_SIZE / 2) as u8,
     };
+
+    // Validates range, returns None if out of bounds
+    pub const fn new(x: u8, y: u8) -> Option<Self> {
+        if (x as usize) < SUB_TILE_SIZE && (y as usize) < SUB_TILE_SIZE {
+            Some(Self { x, y })
+        } else {
+            None
+        }
+    }
 }
 
 // This represent a subtile's global Coord, which means a subtile now can be traced globally.

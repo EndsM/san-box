@@ -356,4 +356,107 @@ impl TileRect {
             max: TileCoord::new(a.x.max(b.x), a.y.max(b.y)),
         }
     }
+
+    // In case a single tile rect is needed
+    pub fn single(tile: TileCoord) -> Self {
+        Self {
+            min: tile,
+            max: tile,
+        }
+    }
+
+    // Minimum bounding rect containing all given tiles; None if empty
+    pub fn bounding<I: IntoIterator<Item = TileCoord>>(tiles: I) -> Option<Self> {
+        let mut iter = tiles.into_iter();
+        let first = iter.next()?;
+        Some(iter.fold(Self::single(first), |r, t| r.including(t)))
+    }
+
+    // Expand rect to include tile
+    pub fn including(self, tile: TileCoord) -> Self {
+        Self {
+            min: TileCoord::new(self.min.x.min(tile.x), self.min.y.min(tile.y)),
+            max: TileCoord::new(self.max.x.max(tile.x), self.max.y.max(tile.y)),
+        }
+    }
+
+    // Expand towards all directions by margin
+    pub fn expanded(self, margin: i32) -> Self {
+        Self {
+            min: self.min.offset(-margin, -margin),
+            max: self.max.offset(margin, margin),
+        }
+    }
+
+    pub fn min(&self) -> TileCoord {
+        self.min
+    }
+
+    pub fn max(&self) -> TileCoord {
+        self.max
+    }
+
+    // Width in tiles
+    pub fn width(&self) -> u32 {
+        self.max.x.abs_diff(self.min.x) + 1
+    }
+
+    // Height in tiles
+    pub fn height(&self) -> u32 {
+        self.max.y.abs_diff(self.min.y) + 1
+    }
+
+    pub fn contains(&self, tile: TileCoord) -> bool {
+        (self.min.x..=self.max.x).contains(&tile.x) && (self.min.y..=self.max.y).contains(&tile.y)
+    }
+
+    pub fn intersects(&self, other: &TileRect) -> bool {
+        self.min.x <= other.max.x
+            && other.min.x <= self.max.x
+            && self.min.y <= other.max.y
+            && other.min.y <= self.max.y
+    }
+
+    // Row-major iterator over all tiles inside the rect
+    pub fn iter(self) -> impl Iterator<Item = TileCoord> {
+        (self.min.y..=self.max.y)
+            .flat_map(move |y| (self.min.x..=self.max.x).map(move |x| TileCoord::new(x, y)))
+    }
+
+    // Width in sub-tiles
+    pub fn sub_width(&self) -> usize {
+        self.width() as usize * SUB_TILE_SIZE
+    }
+
+    // Height in sub-tiles
+    pub fn sub_height(&self) -> usize {
+        self.height() as usize * SUB_TILE_SIZE
+    }
+
+    // Sub-map's top-left corner in global sub-tile coordinates
+    pub fn sub_origin(&self) -> SubTileCoord {
+        self.min.sub_origin()
+    }
+
+    // Convert global sub-tile coord to battlefield local coord; returns None if outside
+    pub fn sub_to_battle(&self, sub: SubTileCoord) -> Option<BattleCoord> {
+        if !self.contains(sub.tile()) {
+            return None;
+        }
+        let origin = self.sub_origin();
+        Some(BattleCoord::new(sub.x - origin.x, sub.y - origin.y))
+    }
+
+    // Convert battlefield local coord to global sub-tile coord; returns None if out of bounds
+    pub fn battle_to_sub(&self, battle: BattleCoord) -> Option<SubTileCoord> {
+        if battle.x < 0
+            || battle.y < 0
+            || battle.x as usize >= self.sub_width()
+            || battle.y as usize >= self.sub_height()
+        {
+            return None;
+        }
+        let origin = self.sub_origin();
+        Some(SubTileCoord::new(origin.x + battle.x, origin.y + battle.y))
+    }
 }

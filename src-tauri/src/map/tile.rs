@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 // Use a enum for terrains for now
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum Terrain {
     Plain,
     Grassland,
@@ -30,4 +31,8 @@ pub enum RoadLevel {
     Highway,
 }
 
-pub struct Tile {}
+pub struct Tile {
+    terrain: Terrain,
+    // Maybe add a elevation to tiles
+    elevation: u8,
+}

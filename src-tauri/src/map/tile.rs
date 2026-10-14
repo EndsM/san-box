@@ -18,4 +18,12 @@ impl Terrain {
     }
 }
 
+// Tile could be on a road
+pub enum RoadLevel {
+    None,
+    Path,
+    Road,
+    Highway,
+}
+
 pub struct Tile {}

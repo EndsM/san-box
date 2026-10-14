@@ -132,7 +132,12 @@ impl TileCoord {
         Self { x, y }
     }
 
-    // Translate to one subtile's Global Coord
+    // Translate to top-left subtile's Global Coord
+    pub const fn sub_origin(self) -> SubTileCoord {
+        SubTileCoord::new(self.x * SIZE_I32, self.y * SIZE_I32)
+    }
+
+    // Translate a local sub-tile to its global coordinate
     pub const fn sub(self, local: LocalCoord) -> SubTileCoord {
         SubTileCoord::new(
             self.x * SIZE_I32 + local.x as i32,
@@ -143,6 +148,12 @@ impl TileCoord {
 
 // This represent a subtile's coord in its Tile, thus LocalCoord
 pub struct LocalCoord {
+    x: u8,
+    y: u8,
+}
+
+// Shadow struct for serd and deserd check
+struct LocalCoordRepr {
     x: u8,
     y: u8,
 }

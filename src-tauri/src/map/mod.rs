@@ -1,4 +1,7 @@
 pub mod coords;
+pub mod region;
+pub mod tile;
+pub mod world;
 
 pub use coords::{
     BattleCoord, Direction, GridCoord, LocalCoord, SUB_TILE_COUNT, SUB_TILE_SIZE, SubTileCoord,

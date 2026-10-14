@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+
 // Use a enum for terrains for now
 pub enum Terrain {
     Plain,
@@ -19,7 +21,9 @@ impl Terrain {
 }
 
 // Tile could be on a road
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
 pub enum RoadLevel {
+    #[default]
     None,
     Path,
     Road,

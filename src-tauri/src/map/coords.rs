@@ -18,6 +18,7 @@ pub enum Direction {
 }
 
 impl Direction {
+    // Cardinal directions only
     pub const CARDINAL: [Direction; 4] = [
         Direction::North,
         Direction::East,
@@ -25,7 +26,8 @@ impl Direction {
         Direction::West,
     ];
 
-    pub const ALL:[Direction;8]=[
+    // All directions, clockwise from North
+    pub const ALL: [Direction; 8] = [
         Direction::North,
         Direction::NorthEast,
         Direction::East,

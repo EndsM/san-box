@@ -2,7 +2,7 @@ use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
-use crate::map::RegionId;
+use crate::map::{RegionId, error::MapError};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Region {
@@ -36,5 +36,59 @@ pub struct RegionRegistry {
 impl RegionRegistry {
     pub fn new() -> Self {
         Self::default()
+    }
+
+    // Add a region, `parent: None` makes it a top layer region
+    pub fn add(
+        &mut self,
+        name: impl Into<String>,
+        parent: Option<RegionId>,
+    ) -> Result<RegionId, MapError> {
+        if let Some(p) = parent
+            && !self.contains(p)
+        {
+            return Err(MapError::UnknownRegion(p));
+        }
+        let id = RegionId::new(self.next_id);
+        self.next_id += 1;
+        self.regions.insert(
+            id,
+            Region {
+                id,
+                name: name.into(),
+                parent,
+            },
+        );
+        Ok(id)
+    }
+
+    pub fn get(&self, id: RegionId) -> Option<&Region> {
+        self.regions.get(&id)
+    }
+
+    pub fn contains(&self, id: RegionId) -> bool {
+        self.regions.contains_key(&id)
+    }
+
+    pub fn len(&self) -> usize {
+        self.regions.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.regions.is_empty()
+    }
+
+    pub fn iter(&self) -> impl Iterator<Item = &Region> {
+        self.regions.values()
+    }
+
+    // Top layer regions
+    pub fn roots(&self) -> impl Iterator<Item = &Region> {
+        self.iter().filter(|r| r.parent.is_none())
+    }
+
+    // Direct children only
+    pub fn children(&self, id: RegionId) -> impl Iterator<Item = &Region> {
+        self.iter().filter(move |r| r.parent == Some(id))
     }
 }

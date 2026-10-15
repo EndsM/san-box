@@ -34,6 +34,7 @@ pub enum RoadLevel {
     Highway,
 }
 
+// A single tile of the world map
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
 pub struct MapTile {
     terrain: Terrain,

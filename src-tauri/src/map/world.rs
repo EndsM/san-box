@@ -7,5 +7,11 @@ pub struct WorldMap {
 }
 
 impl WorldMap {
-    
+    pub fn new(bounds: TileRect) -> Self {
+        let count = bounds.width() as usize * bounds.height() as usize;
+        Self {
+            bounds,
+            tiles: vec![MapTile::default(); count],
+        }
+    }
 }

@@ -1,3 +1,6 @@
+use serde::{Deserialize, Serialize};
+use std::fmt::{Display, Formatter, Result};
+
 macro_rules! define_id {
     ($(#[$meta:meta])* $name:ident) => {
         $(#[$meta])*
@@ -15,5 +18,25 @@ macro_rules! define_id {
                 self.0
             }
         }
+
+        impl From<u32> for $name {
+            fn from(raw: u32) -> Self {
+                Self::new(raw)
+            }
+        }
+
+        impl From<$name> for u32 {
+            fn from(id: $name) -> u32 {
+                id.get()
+            }
+        }
+
+        impl Display for $name{
+            fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+                write!(f, "{}({})", stringify!($name), self.0)
+            }
+        }
     };
 }
+
+define_id!(RegionId);

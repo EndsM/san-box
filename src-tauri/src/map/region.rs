@@ -1,4 +1,4 @@
-use std::collections::BTreeMap;
+use std::{collections::BTreeMap, iter};
 
 use serde::{Deserialize, Serialize};
 
@@ -90,5 +90,15 @@ impl RegionRegistry {
     // Direct children only
     pub fn children(&self, id: RegionId) -> impl Iterator<Item = &Region> {
         self.iter().filter(move |r| r.parent == Some(id))
+    }
+
+    pub fn ancestors(&self, id: RegionId) -> impl Iterator<Item = RegionId> {
+        let parent_of = |r: RegionId| self.get(r).and_then(|region| region.parent);
+        iter::successors(parent_of(id), move |&p| parent_of(p))
+    }
+
+    // True if `id` is `ancestor` itself or sits anywhere below it
+    pub fn is_within(&self, id: RegionId, ancestor: RegionId) -> bool {
+        id == ancestor || self.ancestors(id).any(|a| a == ancestor)
     }
 }

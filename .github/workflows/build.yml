@@ -23,7 +23,7 @@ env:
   CARGO_TERM_COLOR: always
   ASSET_NSIS: Windows-Installer.exe
   ASSET_MSI: Windows-Installer-MSI.msi
-  ASSET_PORTABLE: Windows-No-Install.zip
+  ASSET_PORTABLE: Windows-Portable.zip
   ASSET_APPIMAGE: Linux.AppImage
   ASSET_DEB: Linux-Debian-Ubuntu.deb
   ASSET_RPM: Linux-Fedora.rpm

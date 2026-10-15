@@ -1,9 +1,10 @@
-use crate::map::{MapTile, TileRect};
+use crate::map::{MapTile, TileRect, region::RegionRegistry};
 
 #[derive(Debug, Clone)]
 pub struct WorldMap {
     bounds: TileRect,
     tiles: Vec<MapTile>,
+    regions: RegionRegistry,
 }
 
 impl WorldMap {
@@ -12,6 +13,7 @@ impl WorldMap {
         Self {
             bounds,
             tiles: vec![MapTile::default(); count],
+            regions: RegionRegistry::new(),
         }
     }
 }

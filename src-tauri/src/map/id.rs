@@ -40,3 +40,5 @@ macro_rules! define_id {
 }
 
 define_id!(RegionId);
+
+define_id!(SettlementId);

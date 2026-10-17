@@ -117,4 +117,8 @@ impl SettlementRegistry {
     pub fn iter(&self) -> impl Iterator<Item = &Settlement> {
         self.settlements.values()
     }
+
+    pub(super) fn remove(&mut self, id: SettlementId) -> Option<Settlement> {
+        self.settlements.remove(&id)
+    }
 }

@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::map::id::RegionId;
+use crate::map::{SettlementId, id::RegionId};
 
 // Use a enum for terrains for now
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
@@ -42,6 +42,8 @@ pub struct MapTile {
     elevation: u8,
     road: RoadLevel,
     region: Option<RegionId>,
+    // Set by WorldMap when a settlement is placed, it linked to Settlement::footprint
+    settlement: Option<SettlementId>,
 }
 
 impl MapTile {
@@ -51,6 +53,7 @@ impl MapTile {
             elevation: 0,
             road: RoadLevel::None,
             region: None,
+            settlement: None,
         }
     }
 
@@ -103,5 +106,13 @@ impl MapTile {
 
     pub fn set_region(&mut self, region: Option<RegionId>) {
         self.region = region;
+    }
+
+    pub const fn settlement(&self) -> Option<SettlementId> {
+        self.settlement
+    }
+
+    pub fn set_settlement(&mut self, settlement: Option<SettlementId>) {
+        self.settlement = settlement;
     }
 }

@@ -1,10 +1,16 @@
-use crate::map::{MapTile, RegionId, TileCoord, TileRect, error::MapError, region::RegionRegistry};
+use std::collections::BTreeSet;
+
+use crate::map::{
+    MapTile, RegionId, Settlement, SettlementId, SettlementRegistry, SettlementType, TileCoord,
+    TileRect, error::MapError, region::RegionRegistry, settlement::validate_shape,
+};
 
 #[derive(Debug, Clone)]
 pub struct WorldMap {
     bounds: TileRect,
     tiles: Vec<MapTile>,
     regions: RegionRegistry,
+    settlements: SettlementRegistry,
 }
 
 impl WorldMap {
@@ -14,6 +20,7 @@ impl WorldMap {
             bounds,
             tiles: vec![MapTile::default(); count],
             regions: RegionRegistry::new(),
+            settlements: SettlementRegistry::new(),
         }
     }
 
@@ -91,5 +98,52 @@ impl WorldMap {
             TileCoord::new(rect.min().x.max(b_min.x), rect.min().y.max(b_min.y)),
             TileCoord::new(rect.max().x.min(b_max.x), rect.max().y.min(b_max.y)),
         ))
+    }
+
+    pub fn settlements(&self) -> &SettlementRegistry {
+        &self.settlements
+    }
+
+    // Which settlement (if any) occupies this tile
+    pub fn settlement_at(&self, coord: TileCoord) -> Result<Option<&Settlement>, MapError> {
+        Ok(self
+            .tile(coord)?
+            .settlement()
+            .and_then(|id| self.settlements.get(id)))
+    }
+
+    // Validate everything first, then mutate, so a failure never leaves a half-written settlement
+    pub fn add_settlement(
+        &mut self,
+        name: impl Into<String>,
+        settlement_type: SettlementType,
+        footprint: BTreeSet<TileCoord>,
+    ) -> Result<SettlementId, MapError> {
+        validate_shape(&footprint)?;
+        for &c in &footprint {
+            if let Some(owner) = self.tile(c)?.settlement() {
+                return Err(MapError::TileOccupied(c, owner));
+            }
+        }
+        let id = self
+            .settlements
+            .insert(name, settlement_type, footprint.clone());
+        for c in footprint {
+            let i = self.offset(c); // all coords were bounds-checked above
+            self.tiles[i].set_settlement(Some(id));
+        }
+        Ok(id)
+    }
+
+    pub fn remove_settlement(&mut self, id: SettlementId) -> Result<Settlement, MapError> {
+        let removed = self
+            .settlements
+            .remove(id)
+            .ok_or(MapError::UnknownSettlement(id))?;
+        for &c in removed.footprint() {
+            let i = self.offset(c);
+            self.tiles[i].set_settlement(None);
+        }
+        Ok(removed)
     }
 }

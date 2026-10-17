@@ -10,6 +10,7 @@ pub enum MapError {
     UnknownSettlement(SettlementId),
     EmptyFootprint,
     DisconnectedFootprint, // As for now, Settlement footprint should be connected
+    TileOccupied(TileCoord, SettlementId),
 }
 
 impl Display for MapError {
@@ -21,6 +22,9 @@ impl Display for MapError {
             MapError::EmptyFootprint => write!(f, "settlement footprint is empty"),
             MapError::DisconnectedFootprint => {
                 write!(f, "settlement footprint is not edge-connected")
+            }
+            MapError::TileOccupied(c, id) => {
+                write!(f, "tile ({}, {}) already belongs to {id}", c.x, c.y)
             }
         }
     }

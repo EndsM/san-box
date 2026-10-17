@@ -12,6 +12,8 @@ pub use coords::{
 };
 pub use error::MapError;
 pub use id::RegionId;
+pub use id::SettlementId;
 pub use region::{Region, RegionRegistry};
+pub use settlement::{Settlement, SettlementRegistry, SettlementType};
 pub use tile::{MapTile, RoadLevel, Terrain};
 pub use world::WorldMap;

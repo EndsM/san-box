@@ -8,6 +8,7 @@ on:
       - "**.md"
       - ".vscode/**"
       - ".gitignore"
+      - ".gitattributes"
   workflow_dispatch:
 
 # A newer push to main supersedes an older, still-running build.

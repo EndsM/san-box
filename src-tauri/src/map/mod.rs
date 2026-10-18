@@ -3,6 +3,8 @@ pub mod error;
 pub mod id;
 pub mod region;
 pub mod settlement;
+pub mod submap;
+pub mod subtile;
 pub mod tile;
 pub mod world;
 

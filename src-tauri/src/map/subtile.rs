@@ -13,6 +13,8 @@ pub enum Structure {
     Gate,
     Building,
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
 pub struct SubTile {
     terrain: Terrain,
     elevation: u8,

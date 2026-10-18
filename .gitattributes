@@ -1,0 +1,21 @@
+# Default: let Git detect text files and normalize them to LF in the repo
+* text=auto eol=lf
+
+# --- Source code: always LF ---
+*.rs        text eol=lf diff=rust
+*.ts        text eol=lf
+*.tsx       text eol=lf
+*.css       text eol=lf diff=css
+*.html      text eol=lf diff=html
+
+# --- Lockfiles: LF, exclude in code statistic ---
+Cargo.lock          text eol=lf linguist-generated=true
+package-lock.json   text eol=lf linguist-generated=true
+
+# --- Binary: never touch ---
+*.png       binary
+*.jpg       binary
+*.jpeg      binary
+*.gif       binary
+*.webp      binary
+*.ico       binary

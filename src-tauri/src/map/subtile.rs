@@ -33,4 +33,37 @@ impl SubTile {
         self.elevation = elevation;
         self
     }
+
+    pub const fn with_structure(mut self, structure: Structure) -> Self {
+        self.structure = structure;
+        self
+    }
+
+    pub const fn terrain(&self) -> Terrain {
+        self.terrain
+    }
+
+    pub const fn elevation(&self) -> u8 {
+        self.elevation
+    }
+
+    pub const fn structure(&self) -> Structure {
+        self.structure
+    }
+
+    pub const fn is_water(&self) -> bool {
+        self.terrain.is_water()
+    }
+
+    pub fn set_terrain(&mut self, terrain: Terrain) {
+        self.terrain = terrain;
+    }
+
+    pub fn set_elevation(&mut self, elevation: u8) {
+        self.elevation = elevation;
+    }
+
+    pub fn set_structure(&mut self, structure: Structure) {
+        self.structure = structure;
+    }
 }

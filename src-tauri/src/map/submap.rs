@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::map::{SUB_TILE_COUNT, subtile::SubTile};
+use crate::map::{LocalCoord, SUB_TILE_COUNT, subtile::SubTile};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SubMap {
@@ -12,6 +12,23 @@ impl SubMap {
         Self {
             tiles: vec![tile; SUB_TILE_COUNT],
         }
+    }
+
+    pub fn get(&self, at: LocalCoord) -> &SubTile {
+        &self.tiles[at.index()]
+    }
+
+    pub fn get_mut(&mut self, at: LocalCoord) -> &mut SubTile {
+        &mut self.tiles[at.index()]
+    }
+
+    pub fn set(&mut self, at: LocalCoord, tile: SubTile) {
+        self.tiles[at.index()] = tile;
+    }
+
+    // Row-major over the whole grid
+    pub fn iter(&self) -> impl Iterator<Item = (LocalCoord, &SubTile)> {
+        LocalCoord::all().zip(self.tiles.iter())
     }
 }
 

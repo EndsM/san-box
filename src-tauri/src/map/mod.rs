@@ -2,6 +2,7 @@ pub mod coords;
 pub mod demo;
 pub mod error;
 pub mod id;
+pub mod noise;
 pub mod region;
 pub mod settlement;
 pub mod submap;

@@ -97,7 +97,10 @@ export default function MapCanvas({ map }: { map: MapSnapshot }) {
       const mx = e.clientX - rect.left;
       const my = e.clientY - rect.top;
       setView((v) => {
-        const scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, v.scale * (e.deltaY < 0 ? 1.15 : 1 / 1.15)));
+        const scale = Math.min(
+          MAX_SCALE,
+          Math.max(MIN_SCALE, v.scale * (e.deltaY < 0 ? 1.15 : 1 / 1.15)),
+        );
         const k = scale / v.scale;
         return { scale, x: mx - (mx - v.x) * k, y: my - (my - v.y) * k };
       });
@@ -124,7 +127,9 @@ export default function MapCanvas({ map }: { map: MapSnapshot }) {
     const x1 = Math.min(map.width, Math.ceil((size.w - ox) / scale));
     const y1 = Math.min(map.height, Math.ceil((size.h - oy) / scale));
     const at = (tx: number, ty: number) =>
-      tx < 0 || ty < 0 || tx >= map.width || ty >= map.height ? null : map.tiles[ty * map.width + tx];
+      tx < 0 || ty < 0 || tx >= map.width || ty >= map.height
+        ? null
+        : map.tiles[ty * map.width + tx];
 
     // Terrain, region tint, settlement fill
     for (let ty = y0; ty < y1; ty++) {
@@ -184,7 +189,10 @@ export default function MapCanvas({ map }: { map: MapSnapshot }) {
         }
         // Settlement outline: draw an edge wherever the neighbour is a different settlement (or none)
         const edge = (n: typeof t | null, x1_: number, y1_: number, x2_: number, y2_: number) => {
-          if ((n?.settlement ?? null) !== t.settlement && (t.settlement !== null || n?.settlement != null)) {
+          if (
+            (n?.settlement ?? null) !== t.settlement &&
+            (t.settlement !== null || n?.settlement != null)
+          ) {
             settlePath.moveTo(x1_, y1_);
             settlePath.lineTo(x2_, y2_);
           }
@@ -244,7 +252,9 @@ export default function MapCanvas({ map }: { map: MapSnapshot }) {
       <canvas
         ref={canvasRef}
         style={{ width: size.w, height: size.h, cursor: drag.current ? "grabbing" : "grab" }}
-        onMouseDown={(e) => (drag.current = { sx: e.clientX, sy: e.clientY, vx: view.x, vy: view.y })}
+        onMouseDown={(e) =>
+          (drag.current = { sx: e.clientX, sy: e.clientY, vx: view.x, vy: view.y })
+        }
         onMouseMove={(e) => {
           if (drag.current) {
             const d = drag.current;
@@ -260,15 +270,27 @@ export default function MapCanvas({ map }: { map: MapSnapshot }) {
       />
       <div className="map-panel">
         <label>
-          <input type="checkbox" checked={showRegions} onChange={(e) => setShowRegions(e.target.checked)} /> Regions
+          <input
+            type="checkbox"
+            checked={showRegions}
+            onChange={(e) => setShowRegions(e.target.checked)}
+          />{" "}
+          Regions
         </label>
         <label>
-          <input type="checkbox" checked={showGrid} onChange={(e) => setShowGrid(e.target.checked)} /> Grid
+          <input
+            type="checkbox"
+            checked={showGrid}
+            onChange={(e) => setShowGrid(e.target.checked)}
+          />{" "}
+          Grid
         </label>
         <hr />
         {hover && hovered ? (
           <>
-            <div>Tile ({hover.x + map.minX}, {hover.y + map.minY})</div>
+            <div>
+              Tile ({hover.x + map.minX}, {hover.y + map.minY})
+            </div>
             <div>Terrain: {hovered.terrain}</div>
             <div>Region: {hovered.region !== null ? lookup.regionPath(hovered.region) : "—"}</div>
             <div>

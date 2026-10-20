@@ -1,6 +1,14 @@
 export type Terrain =
-  | "Plain" | "Grassland" | "Forest" | "Hill" | "Mountain"
-  | "Desert" | "Swamp" | "Lake" | "River" | "Sea";
+  | "Plain"
+  | "Grassland"
+  | "Forest"
+  | "Hill"
+  | "Mountain"
+  | "Desert"
+  | "Swamp"
+  | "Lake"
+  | "River"
+  | "Sea";
 
 export type RoadLevel = "None" | "Path" | "Road" | "Highway";
 

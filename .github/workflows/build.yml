@@ -89,7 +89,10 @@ jobs:
       - name: Collect the bundles
         shell: bash
         run: |
-          mkdir -p dist
+          # Keep release assets separate from Vite's root dist/ directory.
+          rm -rf release-assets
+          mkdir -p release-assets
+
           find src-tauri/target/release/bundle -type f \
             \( -name '*.exe' -o -name '*.msi' -o -name '*.deb' -o -name '*.rpm' -o -name '*.AppImage' \) \
             -print0 |
@@ -103,7 +106,7 @@ jobs:
               *.rpm) kind=$ASSET_RPM ;;
               *) echo "::error::No release name for the bundle $name."; exit 1 ;;
             esac
-            out="dist/san-box-$VERSION-$kind"
+            out="release-assets/san-box-$VERSION-$kind"
             if [ -e "$out" ]; then echo "::error::Two bundles would both be named $out."; exit 1; fi
             cp "$f" "$out"
           done
@@ -119,15 +122,15 @@ jobs:
           fi
           mkdir -p "$RUNNER_TEMP/portable"
           cp "$exe" "$RUNNER_TEMP/portable/"
-          (cd "$RUNNER_TEMP/portable" && 7z a "$GITHUB_WORKSPACE/dist/san-box-$VERSION-$ASSET_PORTABLE" ./*.exe)
+          (cd "$RUNNER_TEMP/portable" && 7z a "$GITHUB_WORKSPACE/release-assets/san-box-$VERSION-$ASSET_PORTABLE" ./*.exe)
 
       - name: List assets
         shell: bash
-        run: ls -la dist
+        run: ls -la release-assets
 
       - uses: actions/upload-artifact@v7
         with:
           name: assets-${{ matrix.name }}
-          path: dist/*
+          path: release-assets/*
           if-no-files-found: error
           compression-level: 0 # installers are already compressed

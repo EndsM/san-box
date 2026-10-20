@@ -1,4 +1,5 @@
 pub mod coords;
+pub mod demo;
 pub mod error;
 pub mod id;
 pub mod region;
@@ -6,6 +7,7 @@ pub mod settlement;
 pub mod submap;
 pub mod subtile;
 pub mod tile;
+pub mod view;
 pub mod world;
 
 pub use coords::{

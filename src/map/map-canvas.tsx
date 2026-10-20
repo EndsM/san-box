@@ -26,6 +26,7 @@ interface View {
 export default function MapCanvas({ map }: { map: MapSnapshot }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const overlayRef = useRef<HTMLCanvasElement>(null);
   const fitted = useRef(false);
   const drag = useRef<{ sx: number; sy: number; vx: number; vy: number } | null>(null);
 
@@ -109,13 +110,17 @@ export default function MapCanvas({ map }: { map: MapSnapshot }) {
     return () => canvas.removeEventListener("wheel", onWheel);
   }, []);
 
-  // Draw
+  // Draw the static map layers (terrain, tints, grid, borders, labels)
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || size.w === 0) return;
     const dpr = window.devicePixelRatio || 1;
-    canvas.width = size.w * dpr;
-    canvas.height = size.h * dpr;
+    const w = Math.round(size.w * dpr);
+    const h = Math.round(size.h * dpr);
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width = w;
+      canvas.height = h;
+    }
     const ctx = canvas.getContext("2d")!;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.fillStyle = "#1b1b1f";
@@ -229,14 +234,30 @@ export default function MapCanvas({ map }: { map: MapSnapshot }) {
         ctx.fillText(s.name, px, py);
       }
     }
+  }, [map, lookup, view, size, showRegions, showGrid]);
 
-    // Hover highlight
-    if (hover) {
-      ctx.strokeStyle = "#fff";
-      ctx.lineWidth = 2;
-      ctx.strokeRect(ox + hover.x * scale, oy + hover.y * scale, scale, scale);
+  // Draw the interactive overlay separately so hover changes never repaint
+  // the static map layers.
+  useEffect(() => {
+    const canvas = overlayRef.current;
+    if (!canvas || size.w === 0) return;
+    const dpr = window.devicePixelRatio || 1;
+    const w = Math.round(size.w * dpr);
+    const h = Math.round(size.h * dpr);
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width = w;
+      canvas.height = h;
     }
-  }, [map, lookup, view, size, hover, showRegions, showGrid]);
+    const ctx = canvas.getContext("2d")!;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, size.w, size.h);
+
+    if (!hover) return;
+    const { scale, x: ox, y: oy } = view;
+    ctx.strokeStyle = "#fff";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(ox + hover.x * scale, oy + hover.y * scale, scale, scale);
+  }, [view, size, hover]);
 
   const tileAt = (e: React.MouseEvent) => {
     const rect = canvasRef.current!.getBoundingClientRect();
@@ -268,6 +289,7 @@ export default function MapCanvas({ map }: { map: MapSnapshot }) {
           setHover(null);
         }}
       />
+      <canvas ref={overlayRef} className="map-overlay" style={{ width: size.w, height: size.h }} />
       <div className="map-panel">
         <label>
           <input
